@@ -3,94 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus</title>
+    <title>NEXUS PROJECT</title>
     <!-- Zewnętrzna, bezpieczna biblioteka Scaledrone -->
     <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
     <style>
-        /* --- EKRAN ANIMACJI STARTOWEJ (CRT / LOGO DECODE) --- */
+        /* --- CUSTOMOWE SCROLLBARY --- */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #331111; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff3333; }
+
+        /* --- EKRAN ANIMACJI STARTOWEJ --- */
         #introScreen {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: #030000;
-            color: #ff1133; 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #030000; color: #ff1133; 
             font-family: ui-monospace, SFMono-Regular, Consolas, "Courier New", monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+            margin: 0; overflow: hidden;
             text-shadow: 0 0 4px #ff0033, 0 0 12px #cc0000, 0 0 20px #990000;
-            z-index: 9999;
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            z-index: 9999; transition: opacity 0.8s ease, transform 0.8s ease;
             opacity: 1;
         }
-        #introScreen.fade-out {
-            opacity: 0;
-            transform: scale(1.05);
-        }
+        #introScreen.fade-out { opacity: 0; transform: scale(1.05); }
 
         #animation-container {
-            font-weight: 900;
-            font-size: 14px;
-            line-height: 1.0; 
-            letter-spacing: -0.2px;
-            white-space: pre;
-            text-align: left;
-            position: relative;
+            font-weight: 900; font-size: 14px; line-height: 1.0; 
+            letter-spacing: -0.2px; white-space: pre; text-align: left;
         }
 
         /* Efekt linii skanujących CRT */
         body::before {
-            content: " ";
-            display: block;
-            position: absolute;
+            content: " "; display: block; position: absolute;
             top: 0; left: 0; bottom: 0; right: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 99999;
-            background-size: 100% 4px, 3px 100%;
-            pointer-events: none;
+            z-index: 99999; background-size: 100% 4px, 3px 100%; pointer-events: none;
         }
 
-        /* --- STYLIZACJA GŁÓWNA SYSTEMU CZATU --- */
+        /* --- STYLIZACJA GŁÓWNA --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #050505;
-            color: #ff3333;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            display: flex;
+            background-color: #050505; color: #ff3333;
+            margin: 0; padding: 0; height: 100vh; width: 100vw;
+            overflow: hidden; display: flex;
         }
         
         .chat-container {
-            width: 100%;
-            height: 100%;
-            background: #0a0a0a;
-            display: flex;
-            flex-direction: column;
-            position: relative;
+            width: 100%; height: 100%; background: #0a0a0a;
+            display: flex; flex-direction: column; position: relative;
         }
 
         .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            box-sizing: border-box;
-            display: none;
-            flex-direction: column;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            box-sizing: border-box; display: none; flex-direction: column;
         }
-        .screen.active {
-            display: flex;
-        }
+        .screen.active { display: flex; }
 
         .animated-bg {
             background: linear-gradient(-45deg, #0f0000, #260000, #050505, #400000);
-            background-size: 400% 400%;
-            animation: gradientMove 12s ease infinite;
+            background-size: 400% 400%; animation: gradientMove 12s ease infinite;
         }
 
         @keyframes gradientMove {
@@ -99,279 +69,141 @@
             100% { background-position: 0% 50%; }
         }
 
-        .login-screen {
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            gap: 20px;
-        }
+        /* --- LOGOWANIE --- */
+        .login-screen { justify-content: center; align-items: center; padding: 20px; }
         .login-box {
-            width: 480px;
-            max-width: 95%;
-            background: rgba(10, 10, 10, 0.85);
-            padding: 40px 30px;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            box-sizing: border-box;
-            backdrop-filter: blur(8px);
-            z-index: 100;
+            width: 480px; max-width: 95%; background: rgba(10, 10, 10, 0.85);
+            padding: 40px 30px; border-radius: 12px; display: flex;
+            flex-direction: column; gap: 15px; box-sizing: border-box;
+            backdrop-filter: blur(8px); z-index: 100;
         }
 
         .login-input {
-            width: 100%;
-            background: #141414;
-            border: 1px solid #331111;
-            padding: 14px;
-            border-radius: 6px;
-            color: #fff;
-            outline: none;
-            box-sizing: border-box;
-            font-size: 16px;
-            transition: 0.2s;
+            width: 100%; background: #141414; border: 1px solid #331111;
+            padding: 14px; border-radius: 6px; color: #fff; outline: none;
+            box-sizing: border-box; font-size: 16px; transition: 0.2s;
         }
-        .login-input::placeholder {
-            color: #ccc;
-        }
-        .login-input:focus {
-            border-color: #ff3333;
-            box-shadow: 0 0 10px rgba(255, 51, 51, 0.2);
-        }
+        .login-input::placeholder { color: #888; }
+        .login-input:focus { border-color: #ff3333; box-shadow: 0 0 10px rgba(255, 51, 51, 0.2); }
         .login-btn {
-            width: 100%;
-            background: #ff3333;
-            color: #fff;
-            border: none;
-            padding: 14px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: 0.2s;
-            margin-top: 5px;
-            letter-spacing: 1px;
+            width: 100%; background: #ff3333; color: #fff; border: none;
+            padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer;
+            font-size: 1rem; transition: 0.2s; margin-top: 5px; letter-spacing: 1px;
         }
-        .login-btn:hover {
-            background: #b30000;
-            box-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
-        }
+        .login-btn:hover { background: #b30000; box-shadow: 0 0 20px rgba(255, 51, 51, 0.5); }
+        .login-btn:disabled { background: #551111; color: #888; cursor: not-allowed; box-shadow: none; }
 
-        .welcome-screen {
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-        }
+        /* --- WELCOME SCREEN --- */
+        .welcome-screen { justify-content: center; align-items: center; z-index: 10; }
         .welcome-text {
-            font-size: 2.5rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-align: center;
-            color: #fff;
-            text-shadow: 0 0 20px #ff3333, 0 0 40px #b30000;
-            animation: pulseGlow 1.5s infinite alternate;
+            font-size: 2.5rem; font-weight: bold; letter-spacing: 2px;
+            text-align: center; color: #fff; text-shadow: 0 0 20px #ff3333, 0 0 40px #b30000;
+            animation: pulseGlow 1.5s infinite alternate; padding: 20px;
         }
         @keyframes pulseGlow {
             0% { transform: scale(0.96); opacity: 0.8; }
             100% { transform: scale(1.04); opacity: 1; }
         }
 
-        .chat-panel {
-            height: 100%;
-            background: #050505;
-        }
+        /* --- PANEL CZATU --- */
+        .chat-panel { background: #050505; }
         .chat-header {
-            background: #0f0f0f;
-            padding: 10px 30px;
-            font-weight: bold;
-            border-bottom: 1px solid #260c0c;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-            height: 70px;
-            box-sizing: border-box;
+            background: #0f0f0f; padding: 10px 30px; border-bottom: 1px solid #260c0c;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6); height: 70px; box-sizing: border-box;
         }
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+        .header-left { display: flex; align-items: center; gap: 20px; }
         .header-left .ascii-art {
-            margin: 0;
-            font-size: 6px;
-            font-family: monospace;
-            white-space: pre;
-            color: #ff3333;
-            line-height: 1.1;
+            margin: 0; font-size: 6px; font-family: monospace;
+            white-space: pre; color: #ff3333; line-height: 1.1;
         }
         .status {
-            font-size: 0.85rem;
-            color: #ff3333;
-            background: rgba(255, 51, 51, 0.08);
-            padding: 6px 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 51, 51, 0.3);
+            font-size: 0.85rem; color: #888; font-weight: bold;
+            background: rgba(255, 255, 255, 0.05); padding: 6px 12px;
+            border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.3s;
         }
+        .status.online { color: #ff3333; background: rgba(255, 51, 51, 0.08); border-color: rgba(255, 51, 51, 0.3); }
+        .status.offline { color: #ff5555; background: rgba(255, 0, 0, 0.1); border-color: rgba(255, 0, 0, 0.4); }
+        .status.connecting { color: #ffaa00; background: rgba(255, 170, 0, 0.1); border-color: rgba(255, 170, 0, 0.3); }
         
         .chat-main-layout {
-            display: flex;
-            flex: 1;
-            width: 100%;
-            height: calc(100% - 70px);
-            position: relative;
+            display: flex; flex: 1; width: 100%; height: calc(100% - 70px);
         }
         
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
+        .chat-area { flex: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; }
         
         .messages {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            background: #080808;
+            flex: 1; padding: 30px; overflow-y: auto; display: flex;
+            flex-direction: column; gap: 16px; background: #080808;
         }
 
         /* POZYCJONOWANIE WIADOMOŚCI */
-        .message-wrapper {
-            display: flex;
-            flex-direction: column;
-            max-width: 65%;
-            align-self: flex-start;
-        }
-        .message-wrapper.me {
-            align-self: flex-end;
-            align-items: flex-end; 
-        }
+        .message-wrapper { display: flex; flex-direction: column; max-width: 75%; align-self: flex-start; }
+        .message-wrapper.me { align-self: flex-end; align-items: flex-end; }
 
         .message {
-            background: #141414;
-            border: 1px solid #221111;
-            padding: 12px 18px;
-            border-radius: 8px;
-            color: #eee;
-            word-wrap: break-word;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-            white-space: pre-wrap;
-            width: fit-content;
+            background: #141414; border: 1px solid #221111; padding: 12px 18px;
+            border-radius: 8px; color: #eee; word-wrap: break-word; word-break: break-word;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4); white-space: pre-wrap; width: fit-content;
         }
         .message-wrapper.me .message {
-            background: #260000;
-            border-color: #590000;
-            color: #fff;
+            background: #260000; border-color: #590000; color: #fff;
             box-shadow: 0 0 15px rgba(255, 51, 51, 0.15);
         }
-        .message-sender {
-            font-size: 0.8rem;
-            color: #ff3333;
-            margin-bottom: 6px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-        .message-wrapper.me .message-sender {
-            color: #ff8080;
-        }
+        .message-sender { font-size: 0.8rem; color: #ff3333; margin-bottom: 6px; font-weight: bold; letter-spacing: 0.5px; }
+        .message-wrapper.me .message-sender { color: #ff8080; }
 
         .input-area {
-            display: flex;
-            border-top: 1px solid #260c0c;
-            background: #0f0f0f;
-            padding: 15px 20px;
-            align-items: flex-end;
+            display: flex; border-top: 1px solid #260c0c; background: #0f0f0f;
+            padding: 15px 20px; align-items: flex-end;
         }
         .msg-input {
-            flex: 1;
-            background: #050505;
-            border: 1px solid #331111;
-            padding: 14px 16px;
-            color: #fff;
-            outline: none;
-            font-size: 1rem;
-            border-radius: 6px;
-            transition: 0.2s;
-            resize: none;
-            height: 24px;
-            font-family: inherit;
+            flex: 1; background: #050505; border: 1px solid #331111; padding: 14px 16px;
+            color: #fff; outline: none; font-size: 1rem; border-radius: 6px;
+            transition: 0.2s; resize: none; height: 24px; font-family: inherit;
         }
-        .msg-input:focus {
-            border-color: #ff3333;
-        }
+        .msg-input:focus { border-color: #ff3333; }
         .send-btn {
-            background: #ff3333;
-            color: #000;
-            border: none;
-            height: 54px;
-            padding: 0 35px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 1rem;
-            border-radius: 6px;
-            margin-left: 10px;
-            letter-spacing: 1px;
+            background: #ff3333; color: #000; border: none; height: 54px;
+            padding: 0 35px; font-weight: bold; cursor: pointer; transition: 0.2s;
+            font-size: 1rem; border-radius: 6px; margin-left: 10px; letter-spacing: 1px;
         }
-        .send-btn:hover {
-            background: #b30000;
-            color: #fff;
-        }
+        .send-btn:hover { background: #b30000; color: #fff; }
 
         .members-panel {
-            width: 260px;
-            background: #0f0f0f;
-            border-left: 1px solid #260c0c;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
+            width: 260px; background: #0f0f0f; border-left: 1px solid #260c0c;
+            display: flex; flex-direction: column; box-sizing: border-box; flex-shrink: 0;
         }
         .members-title {
-            padding: 15px 20px;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: bold;
-            border-bottom: 1px solid #260c0c;
-            color: #888;
+            padding: 15px 20px; font-size: 0.9rem; text-transform: uppercase;
+            letter-spacing: 2px; font-weight: bold; border-bottom: 1px solid #260c0c; color: #888;
         }
         .members-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            flex: 1; overflow-y: auto; padding: 15px 10px; display: flex; flex-direction: column; gap: 8px;
         }
         .member-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            color: #ccc;
-            font-size: 0.95rem;
+            display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+            border-radius: 6px; color: #ccc; font-size: 0.95rem; word-break: break-all;
         }
-        .member-dot {
-            width: 8px;
-            height: 8px;
-            background: #ff3333;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #ff3333;
-        }
-        .member-item.its-me {
-            color: #fff;
-            font-weight: bold;
+        .member-dot { width: 8px; height: 8px; background: #ff3333; border-radius: 50%; box-shadow: 0 0 8px #ff3333; flex-shrink: 0; }
+        .member-item.its-me { color: #fff; font-weight: bold; }
+
+        /* --- MEDIA QUERIES (MOBILE) --- */
+        @media (max-width: 768px) {
+            .header-left .ascii-art { display: none; }
+            .chat-main-layout { flex-direction: column; }
+            .members-panel { width: 100%; border-left: none; border-top: 1px solid #260c0c; height: 160px; }
+            .chat-header { padding: 10px 15px; }
+            .input-area { padding: 10px; }
+            .messages { padding: 15px; }
+            .message-wrapper { max-width: 90%; }
         }
     </style>
 </head>
 <body>
 
-<!-- EKRAN 0: INTRO ANIMACJA WŁĄCZENIA -->
+<!-- EKRAN 0: INTRO ANIMACJA -->
 <div id="introScreen">
     <pre id="animation-container"></pre>
 </div>
@@ -380,18 +212,18 @@
     <!-- EKRAN 1: LOGOWANIE -->
     <div class="screen login-screen active animated-bg" id="loginScreen">
         <div class="login-box">
-            <input type="text" id="usernameInput" class="login-input" placeholder="Pseudonim członka" autocomplete="off">
-            <input type="password" id="passwordInput" class="login-input" placeholder="Hasło serwera">
-            <button id="loginBtn" class="login-btn">Wejdź na serwer</button>
+            <input type="text" id="usernameInput" class="login-input" placeholder="Wprowadź kryptonim (Nick)" autocomplete="off">
+            <input type="password" id="passwordInput" class="login-input" placeholder="Hasło dostępowe">
+            <button id="loginBtn" class="login-btn">INICJUJ POŁĄCZENIE</button>
         </div>
     </div>
 
-    <!-- EKRAN 2: ANIMACJA POWITALNA -->
+    <!-- EKRAN 2: POWITANIE -->
     <div class="screen welcome-screen animated-bg" id="welcomeScreen">
-        <div class="welcome-text" id="welcomeText">Witaj, Członku</div>
+        <div class="welcome-text" id="welcomeText">Witaj</div>
     </div>
 
-    <!-- EKRAN 3: PANEL CZATU -->
+    <!-- EKRAN 3: CZAT -->
     <div class="screen chat-panel" id="chatPanel">
         <div class="chat-header">
             <div class="header-left">
@@ -402,22 +234,22 @@
 ██║╚██╗██║██╔══╝   ██╔██╗ ██║   ██║╚════██║
 ██║ ╚████║███████╗██╔╝ ██╗╚██████╔╝███████║
 ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝</pre>
-                <span style="letter-spacing: 1px; color: #888; font-size: 0.9rem;">SERVER</span>
+                <span style="letter-spacing: 1px; color: #888; font-size: 1rem; font-weight: bold;">NEXUS CORE</span>
             </div>
-            <span class="status">Online</span>
+            <span class="status connecting" id="connectionStatus">Oczekiwanie...</span>
         </div>
         
         <div class="chat-main-layout">
             <div class="chat-area">
                 <div class="messages" id="messages"></div>
                 <div class="input-area">
-                    <textarea id="msgInput" class="msg-input" placeholder="Napisz coś na serwerze..." autocomplete="off"></textarea>
+                    <textarea id="msgInput" class="msg-input" placeholder="Nadaj komunikat..." autocomplete="off"></textarea>
                     <button id="sendBtn" class="send-btn">Wyślij</button>
                 </div>
             </div>
             
             <div class="members-panel">
-                <div class="members-title">Członkowie online</div>
+                <div class="members-title">Aktywne węzły</div>
                 <div class="members-list" id="membersList"></div>
             </div>
         </div>
@@ -425,41 +257,28 @@
 </div>
 
 <script>
-    // --- SKRYPT ANIMACJI WEJŚCIOWEJ ---
+    // --- INTRO ANIMACJA ---
     const targetLines = [
         "   _  _______  ____  ______   ___ ___  ____     _________________",
         "  ╱ │╱ ╱ __╱ │╱_╱ ╱ ╱ ╱ __╱   ╱ _ ╲╱ _ ╲╱ __ ╲__ ╱ ╱ __╱ ___╱_  __╱",
         " ╱    ╱ _╱_>  <╱ ╱_╱ ╱╲ ╲    ╱ ___╱ , _╱ ╱_╱ ╱ ╱╱ ╱ _╱╱ ╱__  ╱ ╱   ",
         "╱_╱│_╱___╱_╱│_│╲____╱___╱   ╱_╱   ╱_╱│_│╲____╱╲___╱___╱╲___╱ ╱_╱    "
     ];
-
     const container = document.getElementById('animation-container');
     const chars = "╱╲_│┌┐└┘X#M";
     
-    let currentFrame = targetLines.map(line => 
-        Array.from({ length: line.length }, () => " ")
-    );
-
-    let frameCounters = targetLines.map(line => 
-        Array.from({ length: line.length }, () => Math.floor(Math.random() * 25 + 10))
-    );
+    let currentFrame = targetLines.map(line => Array.from({ length: line.length }, () => " "));
+    let frameCounters = targetLines.map(line => Array.from({ length: line.length }, () => Math.floor(Math.random() * 25 + 10)));
 
     function animate() {
-        let done = true;
-        let output = "";
-
+        let done = true; let output = "";
         for (let r = 0; r < targetLines.length; r++) {
             let lineOutput = "";
             for (let c = 0; c < targetLines[r].length; c++) {
-                if (targetLines[r][c] === " ") {
-                    lineOutput += " ";
-                    continue;
-                }
-
+                if (targetLines[r][c] === " ") { lineOutput += " "; continue; }
                 if (frameCounters[r][c] > 0) {
                     currentFrame[r][c] = chars[Math.floor(Math.random() * chars.length)];
-                    frameCounters[r][c]--;
-                    done = false;
+                    frameCounters[r][c]--; done = false;
                 } else {
                     currentFrame[r][c] = targetLines[r][c];
                 }
@@ -467,854 +286,151 @@
             }
             output += lineOutput + "\n";
         }
-
         container.textContent = output;
 
-        if (!done) {
-            setTimeout(animate, 25);
-        } else {
+        if (!done) { setTimeout(animate, 25); } 
+        else {
             setTimeout(() => {
                 const intro = document.getElementById('introScreen');
                 intro.classList.add('fade-out');
                 setTimeout(() => intro.style.display = 'none', 800);
-            }, 500);
+            }, 600);
         }
     }
-
-    // Uruchomienie animacji
-    setTimeout(animate, 150);
-
-    // --- LOGIKA CZATU NEXUS ---
-    const CHANNEL_ID = '<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus</title>
-    <!-- Zewnętrzna, bezpieczna biblioteka Scaledrone -->
-    <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
-    <style>
-        /* --- EKRAN ANIMACJI STARTOWEJ (CRT / LOGO DECODE) --- */
-        #introScreen {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: #030000;
-            color: #ff1133; 
-            font-family: ui-monospace, SFMono-Regular, Consolas, "Courier New", monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            overflow: hidden;
-            text-shadow: 0 0 4px #ff0033, 0 0 12px #cc0000, 0 0 20px #990000;
-            z-index: 9999;
-            transition: opacity 0.8s ease, transform 0.8s ease;
-            opacity: 1;
-        }
-        #introScreen.fade-out {
-            opacity: 0;
-            transform: scale(1.05);
-        }
-
-        #animation-container {
-            font-weight: 900;
-            font-size: 14px;
-            line-height: 1.0; 
-            letter-spacing: -0.2px;
-            white-space: pre;
-            text-align: left;
-            position: relative;
-        }
-
-        /* Efekt linii skanujących CRT */
-        body::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 99999;
-            background-size: 100% 4px, 3px 100%;
-            pointer-events: none;
-        }
-
-        /* --- STYLIZACJA GŁÓWNA SYSTEMU CZATU --- */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #050505;
-            color: #ff3333;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            display: flex;
-        }
-        
-        .chat-container {
-            width: 100%;
-            height: 100%;
-            background: #0a0a0a;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            box-sizing: border-box;
-            display: none;
-            flex-direction: column;
-        }
-        .screen.active {
-            display: flex;
-        }
-
-        .animated-bg {
-            background: linear-gradient(-45deg, #0f0000, #260000, #050505, #400000);
-            background-size: 400% 400%;
-            animation: gradientMove 12s ease infinite;
-        }
-
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .login-screen {
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            gap: 20px;
-        }
-        .login-box {
-            width: 480px;
-            max-width: 95%;
-            background: rgba(10, 10, 10, 0.85);
-            padding: 40px 30px;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            box-sizing: border-box;
-            backdrop-filter: blur(8px);
-            z-index: 100;
-        }
-
-        .login-input {
-            width: 100%;
-            background: #141414;
-            border: 1px solid #331111;
-            padding: 14px;
-            border-radius: 6px;
-            color: #fff;
-            outline: none;
-            box-sizing: border-box;
-            font-size: 16px;
-            transition: 0.2s;
-        }
-        .login-input::placeholder {
-            color: #ccc;
-        }
-        .login-input:focus {
-            border-color: #ff3333;
-            box-shadow: 0 0 10px rgba(255, 51, 51, 0.2);
-        }
-        .login-btn {
-            width: 100%;
-            background: #ff3333;
-            color: #fff;
-            border: none;
-            padding: 14px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: 0.2s;
-            margin-top: 5px;
-            letter-spacing: 1px;
-        }
-        .login-btn:hover {
-            background: #b30000;
-            box-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
-        }
-
-        .welcome-screen {
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-        }
-        .welcome-text {
-            font-size: 2.5rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-align: center;
-            color: #fff;
-            text-shadow: 0 0 20px #ff3333, 0 0 40px #b30000;
-            animation: pulseGlow 1.5s infinite alternate;
-        }
-        @keyframes pulseGlow {
-            0% { transform: scale(0.96); opacity: 0.8; }
-            100% { transform: scale(1.04); opacity: 1; }
-        }
-
-        .chat-panel {
-            height: 100%;
-            background: #050505;
-        }
-        .chat-header {
-            background: #0f0f0f;
-            padding: 10px 30px;
-            font-weight: bold;
-            border-bottom: 1px solid #260c0c;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-            height: 70px;
-            box-sizing: border-box;
-        }
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        .header-left .ascii-art {
-            margin: 0;
-            font-size: 6px;
-            font-family: monospace;
-            white-space: pre;
-            color: #ff3333;
-            line-height: 1.1;
-        }
-        .status {
-            font-size: 0.85rem;
-            color: #ff3333;
-            background: rgba(255, 51, 51, 0.08);
-            padding: 6px 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 51, 51, 0.3);
-        }
-        
-        .chat-main-layout {
-            display: flex;
-            flex: 1;
-            width: 100%;
-            height: calc(100% - 70px);
-            position: relative;
-        }
-        
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        
-        .messages {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            background: #080808;
-        }
-
-        /* POZYCJONOWANIE WIADOMOŚCI */
-        .message-wrapper {
-            display: flex;
-            flex-direction: column;
-            max-width: 65%;
-            align-self: flex-start;
-        }
-        .message-wrapper.me {
-            align-self: flex-end;
-            align-items: flex-end; 
-        }
-
-        .message {
-            background: #141414;
-            border: 1px solid #221111;
-            padding: 12px 18px;
-            border-radius: 8px;
-            color: #eee;
-            word-wrap: break-word;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-            white-space: pre-wrap;
-            width: fit-content;
-        }
-        .message-wrapper.me .message {
-            background: #260000;
-            border-color: #590000;
-            color: #fff;
-            box-shadow: 0 0 15px rgba(255, 51, 51, 0.15);
-        }
-        .message-sender {
-            font-size: 0.8rem;
-            color: #ff3333;
-            margin-bottom: 6px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-        .message-wrapper.me .message-sender {
-            color: #ff8080;
-        }
-
-        .input-area {
-            display: flex;
-            border-top: 1px solid #260c0c;
-            background: #0f0f0f;
-            padding: 15px 20px;
-            align-items: flex-end;
-        }
-        .msg-input {
-            flex: 1;
-            background: #050505;
-            border: 1px solid #331111;
-            padding: 14px 16px;
-            color: #fff;
-            outline: none;
-            font-size: 1rem;
-            border-radius: 6px;
-            transition: 0.2s;
-            resize: none;
-            height: 24px;
-            font-family: inherit;
-        }
-        .msg-input:focus {
-            border-color: #ff3333;
-        }
-        .send-btn {
-            background: #ff3333;
-            color: #000;
-            border: none;
-            height: 54px;
-            padding: 0 35px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 1rem;
-            border-radius: 6px;
-            margin-left: 10px;
-            letter-spacing: 1px;
-        }
-        .send-btn:hover {
-            background: #b30000;
-            color: #fff;
-        }
-
-        .members-panel {
-            width: 260px;
-            background: #0f0f0f;
-            border-left: 1px solid #260c0c;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-        }
-        .members-title {
-            padding: 15px 20px;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: bold;
-            border-bottom: 1px solid #260c0c;
-            color: #888;
-        }
-        .members-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .member-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            color: #ccc;
-            font-size: 0.95rem;
-        }
-        .member-dot {
-            width: 8px;
-            height: 8px;
-            background: #ff3333;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #ff3333;
-        }
-        .member-item.its-me {
-            color: #fff;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-
-<!-- EKRAN 0: INTRO ANIMACJA WŁĄCZENIA -->
-<div id="introScreen">
-    <pre id="animation-container"></pre>
-</div>
-
-<div class="chat-container">
-    <!-- EKRAN 1: LOGOWANIE -->
-    <div class="screen login-screen active animated-bg" id="loginScreen">
-        <div class="login-box">
-            <input type="text" id="usernameInput" class="login-input" placeholder="Pseudonim członka" autocomplete="off">
-            <input type="password" id="passwordInput" class="login-input" placeholder="Hasło serwera">
-            <button id="loginBtn" class="login-btn">Wejdź na serwer</button>
-        </div>
-    </div>
-
-    <!-- EKRAN 2: ANIMACJA POWITALNA -->
-    <div class="screen welcome-screen animated-bg" id="welcomeScreen">
-        <div class="welcome-text" id="welcomeText">Witaj, Członku</div>
-    </div>
-
-    <!-- EKRAN 3: PANEL CZATU -->
-    <div class="screen chat-panel" id="chatPanel">
-        <div class="chat-header">
-            <div class="header-left">
-                <pre class="ascii-art">
-███╗  ██╗███████╗██╗  ██╗██╗   ██╗███████╗
-████╗ ██║██╔════╝╚██╗██╔╝██║   ██║██╔════╝
-██╔██╗██║█████╗   ╚███╔╝ ██║   ██║███████╗
-██║╚██╗██║██╔══╝   ██╔██╗ ██║   ██║╚════██║
-██║ ╚████║███████╗██╔╝ ██╗╚██████╔╝███████║
-╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝</pre>
-                <span style="letter-spacing: 1px; color: #888; font-size: 0.9rem;">SERVER</span>
-            </div>
-            <span class="status">Online</span>
-        </div>
-        
-        <div class="chat-main-layout">
-            <div class="chat-area">
-                <div class="messages" id="messages"></div>
-                <div class="input-area">
-                    <textarea id="msgInput" class="msg-input" placeholder="Napisz coś na serwerze..." autocomplete="off"></textarea>
-                    <button id="sendBtn" class="send-btn">Wyślij</button>
-                </div>
-            </div>
-            
-            <div class="members-panel">
-                <div class="members-title">Członkowie online</div>
-                <div class="members-list" id="membersList"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // --- SKRYPT ANIMACJI WEJŚCIOWEJ ---
-    const targetLines = [
-        "   _  _______  ____  ______   ___ ___  ____     _________________",
-        "  ╱ │╱ ╱ __╱ │╱_╱ ╱ ╱ ╱ __╱   ╱ _ ╲╱ _ ╲╱ __ ╲__ ╱ ╱ __╱ ___╱_  __╱",
-        " ╱    ╱ _╱_>  <╱ ╱_╱ ╱╲ ╲    ╱ ___╱ , _╱ ╱_╱ ╱ ╱╱ ╱ _╱╱ ╱__  ╱ ╱   ",
-        "╱_╱│_╱___╱_╱│_│╲____╱___╱   ╱_╱   ╱_╱│_│╲____╱╲___╱___╱╲___╱ ╱_╱    "
-    ];
-
-    const container = document.getElementById('animation-container');
-    const chars = "╱╲_│┌┐└┘X#M";
-    
-    let currentFrame = targetLines.map(line => 
-        Array.from({ length: line.length }, () => " ")
-    );
-
-    let frameCounters = targetLines.map(line => 
-        Array.from({ length: line.length }, () => Math.floor(Math.random() * 25 + 10))
-    );
-
-    function animate() {
-        let done = true;
-        let output = "";
-
-        for (let r = 0; r < targetLines.length; r++) {
-            let lineOutput = "";
-            for (let c = 0; c < targetLines[r].length; c++) {
-                if (targetLines[r][c] === " ") {
-                    lineOutput += " ";
-                    continue;
-                }
-
-                if (frameCounters[r][c] > 0) {
-                    currentFrame[r][c] = chars[Math.floor(Math.random() * chars.length)];
-                    frameCounters[r][c]--;
-                    done = false;
-                } else {
-                    currentFrame[r][c] = targetLines[r][c];
-                }
-                lineOutput += currentFrame[r][c];
-            }
-            output += lineOutput + "\n";
-        }
-
-        container.textContent = output;
-
-        if (!done) {
-            setTimeout(animate, 25);
-        } else {
-            setTimeout(() => {
-                const intro = document.getElementById('introScreen');
-                intro.classList.add('fade-out');
-                setTimeout(() => intro.style.display = 'none', 800);
-            }, 500);
-        }
-    }
-
-    // Uruchomienie animacji
-    setTimeout(animate, 150);
+    setTimeout(animate, 200);
 
     // --- LOGIKA CZATU NEXUS ---
     const CHANNEL_ID = 'dk8V0l7EW79jysI0'; 
     const ROOM_NAME = 'observable-global-room'; 
     const SERVER_PASSWORD = '123'; 
     
-    let drone = null;
-    let room = null;
-    let myUsername = "";
-    let membersArray = [];
+    let drone = null; let room = null;
+    let myUsername = ""; let membersArray = [];
+    const statusIndicator = document.getElementById('connectionStatus');
+    const msgInput = document.getElementById('msgInput');
 
     function changeScreen(hideId, showId) {
         document.getElementById(hideId).classList.remove('active');
         document.getElementById(showId).classList.add('active');
     }
 
-    // Obsługa logowania
+    // LOGOWANIE
     function handleLogin() {
         const user = document.getElementById('usernameInput').value.trim();
         const pass = document.getElementById('passwordInput').value.trim();
+        const btn = document.getElementById('loginBtn');
 
-        if (user === "" || pass === "") {
-            alert("Uzupełnij oba pola!");
-            return;
-        }
+        if (!user || !pass) return alert("Uzupełnij wszystkie dane dostępowe!");
+        if (pass !== SERVER_PASSWORD) return alert("Odmowa dostępu: Błędne hasło.");
 
-        if (pass !== SERVER_PASSWORD) {
-            alert("Błędne hasło serwera!");
-            return;
-        }
-
+        // Blokada przycisku, żeby nie klikać podwójnie
+        btn.disabled = true;
+        btn.innerText = "AUTORYZACJA...";
         myUsername = user;
 
         changeScreen('loginScreen', 'welcomeScreen');
-        document.getElementById('welcomeText').innerText = `Witaj, ${myUsername}`;
+        document.getElementById('welcomeText').innerText = `Zalogowano jako: ${myUsername}`;
 
         setTimeout(() => {
             changeScreen('welcomeScreen', 'chatPanel');
             initChat();
-        }, 1800); 
+        }, 2000); 
     }
 
     document.getElementById('loginBtn').addEventListener('click', handleLogin);
-    
-    const onEnterLogin = (e) => {
-        if (e.key === 'Enter') handleLogin();
-    };
+    const onEnterLogin = (e) => { if (e.key === 'Enter') handleLogin(); };
     document.getElementById('usernameInput').addEventListener('keydown', onEnterLogin);
     document.getElementById('passwordInput').addEventListener('keydown', onEnterLogin);
 
+    // INICJALIZACJA SCALEDRONE
     function initChat() {
         drone = new Scaledrone(CHANNEL_ID, { data: { name: myUsername } });
 
         drone.on('open', error => {
             if (error) {
-                console.error("Błąd Scaledrone:", error);
-                return;
+                setStatus('BŁĄD POŁĄCZENIA', 'offline');
+                return console.error("Błąd Scaledrone:", error);
             }
-            
+            setStatus('ONLINE', 'online');
             room = drone.subscribe(ROOM_NAME);
+            msgInput.focus(); // Ustawienie kursora od razu w polu tekstowym
             
             room.on('message', message => {
                 const { data, member, clientId } = message;
-
                 let senderName = "Anonim";
-                if (member && member.clientData && member.clientData.name) {
-                    senderName = member.clientData.name;
-                } else if (clientId === drone.clientId) {
-                    senderName = myUsername;
-                }
-
-                const isMe = (clientId === drone.clientId || (member && member.id === drone.clientId));
-                appendMessage(senderName, data, isMe);
+                if (member && member.clientData && member.clientData.name) { senderName = member.clientData.name; } 
+                else if (clientId === drone.clientId) { senderName = myUsername; }
+                appendMessage(senderName, data, (clientId === drone.clientId));
             });
 
-            room.on('members', members => {
-                membersArray = members;
-                updateMembersList();
-            });
-
+            room.on('members', members => { membersArray = members; updateMembersList(); });
             room.on('member_join', member => {
-                if (!membersArray.some(m => m.id === member.id)) {
-                    membersArray.push(member);
-                }
+                if (!membersArray.some(m => m.id === member.id)) membersArray.push(member);
                 updateMembersList();
             });
-
             room.on('member_leave', ({id}) => {
                 const index = membersArray.findIndex(m => m.id === id);
-                if (index !== -1) {
-                    membersArray.splice(index, 1);
-                    updateMembersList();
-                }
+                if (index !== -1) { membersArray.splice(index, 1); updateMembersList(); }
             });
         });
 
-        drone.on('error', err => {
-            console.error("Problem z połączeniem sieciowym:", err);
-        });
+        drone.on('reconnect', () => setStatus('ŁĄCZENIE...', 'connecting'));
+        drone.on('disconnect', () => setStatus('ROZŁĄCZONO', 'offline'));
+        drone.on('error', err => setStatus('BŁĄD SIECI', 'offline'));
+    }
+
+    function setStatus(text, className) {
+        statusIndicator.innerText = text;
+        statusIndicator.className = `status ${className}`;
     }
 
     function updateMembersList() {
         const listDiv = document.getElementById('membersList');
         listDiv.innerHTML = '';
-
         membersArray.forEach(member => {
             const isMe = member.id === drone.clientId;
             const name = member.clientData && member.clientData.name ? member.clientData.name : 'Nieznany';
             
             const item = document.createElement('div');
-            item.classList.add('member-item');
-            if (isMe) item.classList.add('its-me');
-
-            item.innerHTML = `
-                <div class="member-dot"></div>
-                <span>${escapeHTML(name)} ${isMe ? '(Ty)' : ''}</span>
-            `;
+            item.className = `member-item ${isMe ? 'its-me' : ''}`;
+            item.innerHTML = `<div class="member-dot"></div><span>${escapeHTML(name)} ${isMe ? '(Ty)' : ''}</span>`;
             listDiv.appendChild(item);
         });
     }
 
-    const msgInput = document.getElementById('msgInput');
+    // WYSYŁANIE WIADOMOŚCI
     const sendBtn = document.getElementById('sendBtn');
     const messagesDiv = document.getElementById('messages');
 
     msgInput.addEventListener('input', function() {
         this.style.height = 'auto';
-        const newHeight = Math.min(this.scrollHeight, 120);
-        this.style.height = newHeight + 'px';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
     });
 
-    // --- KLUCZOWA POPRAWKA: Prawidłowe wysyłanie wiadomości w Scaledrone ---
     function sendMessage() {
-        const text = msgInput.value.trim();
-        // Sprawdzamy czy tekst nie jest pusty i czy mamy aktywne połączenie drone
-        if (text !== '' && drone) {
-            drone.publish({
-                room: ROOM_NAME,
-                message: text
-            });
-            // Czyścimy pole natychmiast po wysłaniu
+        const text = msgInput.value.trim(); // Trim zapobiega wysyłaniu samych spacji
+        if (text !== '' && drone && statusIndicator.classList.contains('online')) {
+            drone.publish({ room: ROOM_NAME, message: text });
             msgInput.value = '';
             msgInput.style.height = '24px';
+            msgInput.focus();
         }
     }
 
     sendBtn.addEventListener('click', sendMessage);
-    
     msgInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
     });
 
     function escapeHTML(str) {
         if (!str) return "";
-        if (typeof str !== 'string') str = String(str);
-        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
     function appendMessage(sender, text, isMe) {
         const wrapper = document.createElement('div');
-        wrapper.classList.add('message-wrapper');
-        if (isMe) wrapper.classList.add('me');
-
-        wrapper.innerHTML = `
-            <div class="message-sender">${escapeHTML(sender)}</div>
-            <div class="message">${escapeHTML(text)}</div>
-        `;
-        
-        messagesDiv.appendChild(wrapper);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-</script>
-</body>
-</html>'; 
-    const ROOM_NAME = 'observable-global-room'; 
-    const SERVER_PASSWORD = '123'; 
-    
-    let drone = null;
-    let room = null;
-    let myUsername = "";
-    let membersArray = [];
-
-    function changeScreen(hideId, showId) {
-        document.getElementById(hideId).classList.remove('active');
-        document.getElementById(showId).classList.add('active');
-    }
-
-    // Obsługa logowania
-    function handleLogin() {
-        const user = document.getElementById('usernameInput').value.trim();
-        const pass = document.getElementById('passwordInput').value.trim();
-
-        if (user === "" || pass === "") {
-            alert("Uzupełnij oba pola!");
-            return;
-        }
-
-        if (pass !== SERVER_PASSWORD) {
-            alert("Błędne hasło serwera!");
-            return;
-        }
-
-        myUsername = user;
-
-        changeScreen('loginScreen', 'welcomeScreen');
-        document.getElementById('welcomeText').innerText = `Witaj, ${myUsername}`;
-
-        setTimeout(() => {
-            changeScreen('welcomeScreen', 'chatPanel');
-            initChat();
-        }, 1800); 
-    }
-
-    document.getElementById('loginBtn').addEventListener('click', handleLogin);
-    
-    const onEnterLogin = (e) => {
-        if (e.key === 'Enter') handleLogin();
-    };
-    document.getElementById('usernameInput').addEventListener('keydown', onEnterLogin);
-    document.getElementById('passwordInput').addEventListener('keydown', onEnterLogin);
-
-    function initChat() {
-        drone = new Scaledrone(CHANNEL_ID, { data: { name: myUsername } });
-
-        drone.on('open', error => {
-            if (error) {
-                console.error("Błąd Scaledrone:", error);
-                return;
-            }
-            
-            room = drone.subscribe(ROOM_NAME);
-            
-            room.on('message', message => {
-                const { data, member, clientId } = message;
-
-                let senderName = "Anonim";
-                if (member && member.clientData && member.clientData.name) {
-                    senderName = member.clientData.name;
-                } else if (clientId === drone.clientId) {
-                    senderName = myUsername;
-                }
-
-                const isMe = (clientId === drone.clientId || (member && member.id === drone.clientId));
-                appendMessage(senderName, data, isMe);
-            });
-
-            room.on('members', members => {
-                membersArray = members;
-                updateMembersList();
-            });
-
-            room.on('member_join', member => {
-                if (!membersArray.some(m => m.id === member.id)) {
-                    membersArray.push(member);
-                }
-                updateMembersList();
-            });
-
-            room.on('member_leave', ({id}) => {
-                const index = membersArray.findIndex(m => m.id === id);
-                if (index !== -1) {
-                    membersArray.splice(index, 1);
-                    updateMembersList();
-                }
-            });
-        });
-
-        drone.on('error', err => {
-            console.error("Problem z połączeniem sieciowym:", err);
-        });
-    }
-
-    function updateMembersList() {
-        const listDiv = document.getElementById('membersList');
-        listDiv.innerHTML = '';
-
-        membersArray.forEach(member => {
-            const isMe = member.id === drone.clientId;
-            const name = member.clientData && member.clientData.name ? member.clientData.name : 'Nieznany';
-            
-            const item = document.createElement('div');
-            item.classList.add('member-item');
-            if (isMe) item.classList.add('its-me');
-
-            item.innerHTML = `
-                <div class="member-dot"></div>
-                <span>${escapeHTML(name)} ${isMe ? '(Ty)' : ''}</span>
-            `;
-            listDiv.appendChild(item);
-        });
-    }
-
-    const msgInput = document.getElementById('msgInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const messagesDiv = document.getElementById('messages');
-
-    msgInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        const newHeight = Math.min(this.scrollHeight, 120);
-        this.style.height = newHeight + 'px';
-    });
-
-    // --- KLUCZOWA POPRAWKA: Prawidłowe wysyłanie wiadomości w Scaledrone ---
-    function sendMessage() {
-        const text = msgInput.value.trim();
-        // Sprawdzamy czy tekst nie jest pusty i czy mamy aktywne połączenie drone
-        if (text !== '' && drone) {
-            drone.publish({
-                room: ROOM_NAME,
-                message: text
-            });
-            // Czyścimy pole natychmiast po wysłaniu
-            msgInput.value = '';
-            msgInput.style.height = '24px';
-        }
-    }
-
-    sendBtn.addEventListener('click', sendMessage);
-    
-    msgInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-
-    function escapeHTML(str) {
-        if (!str) return "";
-        if (typeof str !== 'string') str = String(str);
-        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
-
-    function appendMessage(sender, text, isMe) {
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('message-wrapper');
-        if (isMe) wrapper.classList.add('me');
-
-        wrapper.innerHTML = `
-            <div class="message-sender">${escapeHTML(sender)}</div>
-            <div class="message">${escapeHTML(text)}</div>
-        `;
-        
+        wrapper.className = `message-wrapper ${isMe ? 'me' : ''}`;
+        wrapper.innerHTML = `<div class="message-sender">${escapeHTML(sender)}</div><div class="message">${escapeHTML(text)}</div>`;
         messagesDiv.appendChild(wrapper);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
