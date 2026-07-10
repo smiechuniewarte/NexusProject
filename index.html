@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexus</title>
+    <!-- Zewnętrzna, bezpieczna biblioteka Scaledrone (zastępuje ten długi ciąg znaków) -->
+    <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
     <style>
         /* --- EKRAN ANIMACJI STARTOWEJ (CRT / LOGO DECODE) --- */
         #introScreen {
@@ -21,11 +23,9 @@
             z-index: 9999;
             transition: opacity 0.8s ease, transform 0.8s ease;
             opacity: 1;
-            pointer-events: auto;
         }
         #introScreen.fade-out {
             opacity: 0;
-            pointer-events: none;
             transform: scale(1.05);
         }
 
@@ -238,34 +238,47 @@
             gap: 16px;
             background: #080808;
         }
+
+        /* POZYCJONOWANIE WIADOMOŚCI */
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 65%;
+            align-self: flex-start;
+        }
+        .message-wrapper.me {
+            align-self: flex-end;
+            align-items: flex-end; 
+        }
+
         .message {
             background: #141414;
             border: 1px solid #221111;
             padding: 12px 18px;
             border-radius: 8px;
             color: #eee;
-            max-width: 65%;
             word-wrap: break-word;
-            align-self: flex-start;
             box-shadow: 0 4px 8px rgba(0,0,0,0.4);
             white-space: pre-wrap;
+            width: fit-content;
         }
-        .message.me {
+        .message-wrapper.me .message {
             background: #260000;
             border-color: #590000;
             color: #fff;
-            align-self: flex-end;
             box-shadow: 0 0 15px rgba(255, 51, 51, 0.15);
         }
-        .message .sender {
+        .message-sender {
             font-size: 0.8rem;
             color: #ff3333;
             margin-bottom: 6px;
             font-weight: bold;
+            letter-spacing: 0.5px;
         }
-        .message.me .sender {
+        .message-wrapper.me .message-sender {
             color: #ff8080;
         }
+
         .input-area {
             display: flex;
             border-top: 1px solid #260c0c;
@@ -411,12 +424,6 @@
     </div>
 </div>
 
-<!-- LOKALNA BIBLIOTEKA SCALEDRONE -->
-<script>
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{("undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:this).Scaledrone=e()}}(function(){return function o(i,s,a){function c(t,e){if(!s[t]){if(!i[t]){var n="function"==typeof require&&require;if(!e&&n)return n(t,!0);if(l)return l(t,!0);throw(n=new Error("Cannot find module '"+t+"'")).code="MODULE_NOT_FOUND",n}n=s[t]={exports:{}},i[t][0].call(n.exports,function(e){return c(i[t][1][e]||e)},n,n.exports,o,i,s,a)}return s[t].exports}for(var l="function"==typeof require&&require,e=0;e<a.length;e++)c(a[e]);return c}({1:[function(e,t,n){"use strict";var o,i=e("./drone");((o=window).EventEmitter=e("events").EventEmitter).prototype.once=function(e,t){var n=this;function o(){n.removeListener(e,o),t.apply(this,arguments)}o.listener=t,this.on(e,o)},o.Scaledrone=i,t.exports=i},{"./drone":2,events:5}],2:[function(e,t,n){"use strict";var o=e("events").EventEmitter,i=e("inherits"),s=e("./room"),a=e("is-websocket-supported");function c(e,t){if(!(this instanceof c))return new c(e,t);if(!e)throw new Error("You must pass a channel ID");t=t||{},this.options=t,this.channelId=e,this.token=null,this.clientId=null,this._rooms={},this._status="closed",a()?(this._wsClass=window.WebSocket||window.MozWebSocket,this.connect()):(this._status="error",setTimeout(function(){this.emit("error",new Error("WebSockets are not supported by this browser"))}.bind(this),0))}i(c,o),c.prototype.connect=function(){var t=this;if("closed"===this._status){this._status="connecting";var e=(this.options.secure?"wss":"ws")+"://"+(this.options.host||"ws.scaledrone.com")+"/v3/websocket?channel="+this.channelId;this.options.data&&(e+="&data="+encodeURIComponent(JSON.stringify(this.options.data))),this.token&&(e+="&token="+this.token),this.socket=new this._wsClass(e),this.socket.onopen=function(){t._status="open"},this.socket.onclose=function(e){var n="open"===t._status;t._status="closed",Object.keys(t._rooms).forEach(function(e){t._rooms[e]._onClose()}),n&&t.emit("close",e),t.options.autoreconnect!==!1&&setTimeout(function(){t.connect()},t.options.reconnectInterval||2e3)},this.socket.onerror=function(e){t.emit("error",e)},this.socket.onmessage=function(e){var n;try{n=JSON.parse(e.data)}catch(e){return void t.emit("error",e)}t._onMessage(n)}}},c.prototype.disconnect=function(){this.options.autoreconnect=!1,this.socket.close()},c.prototype.subscribe=function(e,t){var n=new s(e,this,t);return this._rooms[e]=n,"open"===this._status&&n._subscribe(),n},c.prototype.publish=function(e){this._send({type:"publish",room:e.room,message:e.message})},c.prototype._onMessage=function(e){var t=this;e.error&&this.emit("error",new Error(e.error)),e.type&&(this.emit(e.type,e.data),"handshake"===e.type&&(this.clientId=e.data.client_id,this.token=e.data.token,Object.keys(this._rooms).forEach(function(e){t._rooms[e]._subscribe()}))),e.room&&this._rooms[e.room]&&this._rooms[e.room]._onMessage(e)},c.prototype._send=function(e){"open"===this._status&&this.socket.send(JSON.stringify(e))},t.exports=c},{"./room":3,events:5,inherits:6,"is-websocket-supported":7}],3:[function(e,t,n){"use strict";var o=e("events").EventEmitter,i=e("inherits");function s(e,t,n){this.name=e,this.drone=t,this.options=n||{},this._status="closed"}i(s,o),s.prototype.publish=function(e){this.drone.publish({room:this.name,message:e})},s.prototype.unsubscribe=function(){this.drone._send({type:"unsubscribe",room:this.name}),delete this.drone._rooms[this.name]},s.prototype._subscribe=function(){var e={type:"subscribe",room:this.name};this.options.historyCount&&(e.history_count=this.options.historyCount),this.drone._send(e)},s.prototype._onMessage=function(t){var n=this;t.type?("room_members"===t.type&&(this._status="open",this.emit("members",t.data.map(function(e){return{id:e.id,clientData:e.data}}))),"client_join"===t.type&&this.emit("member_join",{id:t.data.id,clientData:t.data.data}),"client_leave"===t.type&&this.emit("member_leave",{id:t.data.id,clientData:t.data.data})):setTimeout(function(){n.emit("message",{data:t.message,id:t.id,timestamp:t.timestamp,clientId:t.client_id,member:n.drone._rooms[n.name]._getMember(t.client_id)})},0)},s.prototype._onClose=function(){"open"===this._status&&(this._status="closed",this.emit("close"))},s.prototype._getMember=function(e){return e===this.drone.clientId?{id:e,clientData:this.drone.options.data}:null},t.exports=s},{events:5,inherits:6}],4:[function(e,t,n){function o(){}o.prototype.constructor=o,o.prototype.on=o,o.prototype.once=o,o.prototype.off=o,o.prototype.removeListener=o,o.prototype.removeAllListeners=o,o.prototype.emit=o,t.exports=o},{}],5:[function(e,t,n){var o=e(4);function i(){o.call(this),this._listeners=this._listeners||{}}((t.exports=i).EventEmitter=i).prototype=Object.create(o.prototype),i.prototype.on=i.prototype.addListener=function(e,t){this._listeners[e]=this._listeners[e]||[],this._listeners[e].push(t)},i.prototype.removeListener=function(e,t){if(this._listeners[e]){var n=this._listeners[e].indexOf(t);-1!==n&&this._listeners[e].splice(n,1)}},i.prototype.removeAllListeners=function(e){e?delete this._listeners[e]:this._listeners={}},i.prototype.emit=function(e){var t=Array.prototype.slice.call(arguments,1);if(this._listeners[e])for(var n=0;n<this._listeners[e].length;n++)this._listeners[e][n].apply(this,t)}},{4:4}],6:[function(e,t,n){"function"==typeof Object.create?t.exports=function(e,t){e.super_=t,e.prototype=Object.create(t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}})}:t.exports=function(e,t){e.super_=t;var n=function(){};n.prototype=t.prototype,e.prototype=new n,e.prototype.constructor=e}},{}],7:[function(e,t,n){t.exports=function(){return"undefined"!=typeof window&&("WebSocket"in window||"MozWebSocket"in window)}},{}]},{},[1])(1)});
-</script>
-
-<!-- MECHANIKA LOGO ANIMACJI ORAZ INTEGRACJA CZATU -->
 <script>
     // --- SKRYPT ANIMACJI WEJŚCIOWEJ ---
     const targetLines = [
@@ -469,6 +476,8 @@
             setTimeout(() => {
                 const intro = document.getElementById('introScreen');
                 intro.classList.add('fade-out');
+                // Zabezpieczenie: całkowite usunięcie okna animacji z drogi, żeby nie blokowało logowania
+                setTimeout(() => intro.style.display = 'none', 800);
             }, 500);
         }
     }
@@ -486,13 +495,13 @@
     let myUsername = "";
     let membersArray = [];
 
-    // Funkcja do bezpiecznego przełączania ekranów
     function changeScreen(hideId, showId) {
         document.getElementById(hideId).classList.remove('active');
         document.getElementById(showId).classList.add('active');
     }
 
-    document.getElementById('loginBtn').addEventListener('click', () => {
+    // Obsługa logowania
+    function handleLogin() {
         const user = document.getElementById('usernameInput').value.trim();
         const pass = document.getElementById('passwordInput').value.trim();
 
@@ -508,19 +517,25 @@
 
         myUsername = user;
 
-        // Przełączenie na ekran powitalny
         changeScreen('loginScreen', 'welcomeScreen');
         document.getElementById('welcomeText').innerText = `Witaj, ${myUsername}`;
 
-        // Przełączenie na czat po krótkim pokazaniu nicku
         setTimeout(() => {
             changeScreen('welcomeScreen', 'chatPanel');
             initChat();
         }, 1800); 
-    });
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', handleLogin);
+    
+    // Logowanie za pomocą Enter
+    const onEnterLogin = (e) => {
+        if (e.key === 'Enter') handleLogin();
+    };
+    document.getElementById('usernameInput').addEventListener('keydown', onEnterLogin);
+    document.getElementById('passwordInput').addEventListener('keydown', onEnterLogin);
 
     function initChat() {
-        // Inicjalizacja instancji Scaledrone
         drone = new Scaledrone(CHANNEL_ID, { data: { name: myUsername } });
 
         drone.on('open', error => {
@@ -577,7 +592,7 @@
 
         membersArray.forEach(member => {
             const isMe = member.id === drone.clientId;
-            const name = member.clientData ? member.clientData.name : 'Nieznany';
+            const name = member.clientData && member.clientData.name ? member.clientData.name : 'Nieznany';
             
             const item = document.createElement('div');
             item.classList.add('member-item');
@@ -585,7 +600,7 @@
 
             item.innerHTML = `
                 <div class="member-dot"></div>
-                <span>${name} ${isMe ? '(Ty)' : ''}</span>
+                <span>${escapeHTML(name)} ${isMe ? '(Ty)' : ''}</span>
             `;
             listDiv.appendChild(item);
         });
@@ -596,12 +611,11 @@
     const messagesDiv = document.getElementById('messages');
 
     msgInput.addEventListener('input', function() {
-        this.style.height = '24px';
-        const newHeight = Math.min(this.scrollHeight - 28, 120);
+        this.style.height = 'auto'; // naprawa skalowania wysokości pola tekstowego
+        const newHeight = Math.min(this.scrollHeight, 120);
         this.style.height = newHeight + 'px';
     });
 
-    // POPRAWIONA FUNKCJA WYSYŁANIA WIADOMOŚCI
     function sendMessage() {
         const text = msgInput.value.trim();
         if (text !== '' && room) {
@@ -621,15 +635,22 @@
     });
 
     function escapeHTML(str) {
+        if (!str) return "";
+        if (typeof str !== 'string') str = String(str);
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
     function appendMessage(sender, text, isMe) {
-        const msgEl = document.createElement('div');
-        msgEl.classList.add('message');
-        if (isMe) msgEl.classList.add('me');
-        msgEl.innerHTML = `<div class="sender">${escapeHTML(sender)}</div><div>${escapeHTML(text)}</div>`;
-        messagesDiv.appendChild(msgEl);
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('message-wrapper');
+        if (isMe) wrapper.classList.add('me');
+
+        wrapper.innerHTML = `
+            <div class="message-sender">${escapeHTML(sender)}</div>
+            <div class="message">${escapeHTML(text)}</div>
+        `;
+        
+        messagesDiv.appendChild(wrapper);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 </script>
